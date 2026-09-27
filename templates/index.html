@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cattle Breed Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🐄 Cattle Breed Classifier</h1>
+        <p class="subtitle">Upload an image — the model will predict the breed, or flag it as low-confidence / not cattle.</p>
+
+        <form action="/predict" method="post" enctype="multipart/form-data" class="upload-form">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">Classify</button>
+        </form>
+
+        {% if error %}
+            <div class="alert error">{{ error }}</div>
+        {% endif %}
+
+        {% if result %}
+            <div class="result">
+                {% if result.is_confident %}
+                    <h2 class="predicted">Predicted breed: {{ result.predicted_label }}</h2>
+                    <p class="confidence">Confidence: {{ result.confidence }}%</p>
+                {% else %}
+                    <h2 class="uncertain">⚠️ Not confident enough</h2>
+                    <p>Top guess was only {{ result.confidence }}% confident — this may not be a cattle image, or the image quality/angle is unclear.</p>
+                {% endif %}
+
+                <h3>Top 3 predictions</h3>
+                <ul class="top3">
+                    {% for item in result.top3 %}
+                        <li>{{ item.label }} — {{ item.confidence }}%</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
